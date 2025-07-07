@@ -1,5 +1,5 @@
 import validator from 'validator'
-import UserModel from "../models/userModel";
+import UserModel from "../models/userModel.js";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
@@ -8,9 +8,32 @@ const createToken = (id) => {
     return jwt.sign({id},process.env.JWT_SECRET)
 }
 
-const loginUser = async (req,res) => {
 
+const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const user = await UserModel.findOne({ email });
+
+        if (!user) {
+            return res.json({ success: false, message: "User doesn't exist" });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.json({ success: false, message: "Invalid credentials" });
+        }
+
+        const token = createToken(user._id);
+        res.json({ success: true, token });
+
+    } catch (error) {
+        console.log("Login error:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
 }
+
 
 const registerUser = async (req,res) => {
     
@@ -34,7 +57,7 @@ const registerUser = async (req,res) => {
             return res.json ({success:false , message : "please enter strong password"})  
         }
 
-        const salt = await bcrypt.getSalt(10)
+        const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, salt)
         
 
@@ -46,10 +69,15 @@ const registerUser = async (req,res) => {
 
         const user = await newUser.save()
 
+        const token = createToken(user._id)
+        res.json ({success:true,token})
+
 
        
     } catch (error) {
         
+        console.log(error);
+        res.json({success:false,message:error.message})
    }
 }
 
