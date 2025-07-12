@@ -1,6 +1,7 @@
 
 import { v2 as cloudinary } from "cloudinary"
 import productModel from '../models/productModel.js'
+import ProductModel from "../models/productModel.js"
 
 // 4 controller functions
 
@@ -59,6 +60,18 @@ const addProduct = async (req, res) => {
 
 const listProduct = async (req, res) => {
     
+    try {
+
+        const product = await productModel.find({})
+        res.json({ success: true, product })
+        
+
+    } catch (error) {
+
+        console.log(error)
+        res.json({success:false,message:error.message})
+        
+    }
 }
 
 
@@ -66,6 +79,18 @@ const listProduct = async (req, res) => {
 // functionfro remove prodcts
 
 const removeProduct = async (req, res) => {
+
+    try {
+
+        await productModel.findByIdAndDelete(req.body.id)
+        res.json({ success: true, message:"prodct removed" })
+
+    } catch (error) {
+
+         console.log(error)
+        res.json({success:false,message:error.message})
+        
+    }
     
 }
 
@@ -74,6 +99,19 @@ const removeProduct = async (req, res) => {
 // functionfro single  prodcts
 
 const singleProduct = async (req, res) => {
+
+    try {
+
+        const { productId } = req.body
+        const prodct = await ProductModel.findById(productId)
+        res.json ({success:true,prodct})
+
+    } catch (error) {
+
+        console.log(error)
+        res.json({success:false,message:error.message})
+        
+    }
     
 }
 
