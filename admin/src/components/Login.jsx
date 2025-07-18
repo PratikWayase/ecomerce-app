@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import { backendUrl } from '../App'
+import { toast } from 'react-toastify'
 
 const Login = ({ setToken }) => {
 
@@ -12,14 +13,16 @@ const Login = ({ setToken }) => {
     try {
       const response = await axios.post(`${backendUrl}/api/user/admin`, { email, password })
 
-      // Log response for debugging
-      console.log('Login successful:', response.data)
+      if (response.data.success) {
 
-      // Assuming token is returned in response.data.token
-      setToken(response.data.token)
+        setToken(response.data.token)
+        
+      } else {
+        toast.error(response.data.message)
+      }
     } catch (error) {
       console.error('Login failed:', error)
-      alert('Invalid credentials or server error. Please try again.')
+      toast.error(error.message)
     }
   }
 
