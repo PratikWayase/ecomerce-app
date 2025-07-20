@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { Form } from 'react-router-dom'
 import { assets } from '../assets/assets'
-
+import axios from 'axios'
+import {backendUrl} from '../App'
 
 
 
@@ -27,6 +28,32 @@ const Add = () => {
 
 
   const onSubmitHandler = async (e) => {
+
+    e.preventDefault();
+
+    try {
+      const fromData = new FormData()
+
+      fromData.append("name", name)
+      fromData.append("description",description)
+      fromData.append("price", Price)
+      fromData.append("category", Category)
+      fromData.append("subCategory", subCategory)
+      fromData.append("bestseller", bestseller)
+      fromData.append("sizes", JSON.stringify(Sizes))
+      
+
+      image1 && fromData.append("image1", image1)
+      image2 && fromData.append("image2", image2)
+      image3 && fromData.append("image3", image3)
+      image4 && fromData.append("image4", image4)
+      
+      const response =  await axios.post(backendUrl + "/api/product/add",FormData)
+      
+
+    } catch (error) {
+      
+    }
 
   }
 
