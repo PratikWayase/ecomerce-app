@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { backendUrl } from '../App'
+import { backendUrl, currency } from '../App'
 import { toast } from 'react-toastify'
 
 const List = () => {
@@ -12,8 +12,8 @@ const List = () => {
     try {
 
       const response = await axios.get(backendUrl + '/api/product/list')
-      if (response.data.products) {
-        setList(response.data.products)
+      if (response.data.product) {
+        setList(response.data.product)
       }
       else {
         toast.error(response.data.message)
@@ -28,7 +28,7 @@ const List = () => {
   }
 
   useEffect(() => {
-
+    fetchList()
   }, [])
 
   return (
@@ -42,8 +42,22 @@ const List = () => {
           <b>name</b>
           <b>Category</b>
           <b>Price</b>
-          <b>Action</b>
+          <b className='text-center'>Action</b>
         </div>
+
+        {/* Product list */}
+
+        {
+          list.map((item, index) => (
+            <div key={index}>
+              <img src={item.image[0]} alt='' />
+              <p>{item.name}</p>
+              <p>{item.Category}</p>
+              <p>{currency}{item.price}</p>
+              <p>x</p>
+            </div>
+          ))
+        }
       </div>
     </>
   )
