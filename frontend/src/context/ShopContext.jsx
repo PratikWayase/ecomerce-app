@@ -95,6 +95,9 @@ const ShopContextProvider = (props) => {
     }
   }
   
+  useEffect(() => {
+    getProductsData()
+  },[])
 
 
 
