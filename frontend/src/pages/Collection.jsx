@@ -1,3 +1,4 @@
+// In Collection.jsx
 import React, { useContext, useEffect, useState } from 'react';
 import { ShopContext } from '../context/ShopContext';
 import { assets } from '../assets/assets';
@@ -6,7 +7,7 @@ import Title from '../components/Title';
 import ProductItem from '../components/ProductItem';
 
 const Collection = () => {
-  const { products, search, showSearch } = useContext(ShopContext);
+  const { products, search, showSearch, loading } = useContext(ShopContext);
   const [showFilter, setShowFilter] = useState(false);
   const [filterProducts, setFilterProducts] = useState([]);
   const [category, setCategory] = useState([]);
@@ -32,11 +33,11 @@ const Collection = () => {
   };
 
   const applyFilter = () => {
-    let productsCopy = products;
+    let productsCopy = Array.isArray(products) ? [...products] : [];
 
     if (showSearch && search) {
       productsCopy = productsCopy.filter((item) =>
-        item.name.toLowerCase().includes(search.toLowerCase())
+        item.name?.toLowerCase().includes(search.toLowerCase())
       );
     }
 
@@ -52,7 +53,7 @@ const Collection = () => {
   };
 
   const sortProduct = () => {
-    let fpCopy = filterProducts.slice();
+    let fpCopy = [...filterProducts];
 
     switch (sortType) {
       case 'low-high':
@@ -73,14 +74,19 @@ const Collection = () => {
 
   useEffect(() => {
     applyFilter();
-  }, [category, subCategory, products, search, showSearch]);
+  }, [category, subCategory, search, showSearch]);
 
   useEffect(() => {
     sortProduct();
   }, [sortType]);
 
+  if (loading) {
+    return <div>Loading products...</div>;
+  }
+
   return (
     <div className="flex flex-col sm:flex-row gap-2 sm:gap-10 pt-10 border-t">
+      {/* Filter Section */}
       <div className="min-w-60">
         <div className="flex items-center">
           <p onClick={() => setShowFilter(!showFilter)} className="my-2 text-xl cursor-pointer">
@@ -92,7 +98,6 @@ const Collection = () => {
             alt="dropdown"
           />
         </div>
-
         <div className={`border-gray-300 pl-5 py-3 mt-6 ${showFilter ? '' : 'hidden'} sm:block`}>
           <p className="mb-3 text-sm font-medium">CATEGORIES</p>
           <div className="flex flex-col gap-2 text-sm font-light text-gray-500">
@@ -128,7 +133,6 @@ const Collection = () => {
             </p>
           </div>
         </div>
-
         <div className={`border-gray-300 pl-5 py-3 my-6 ${showFilter ? '' : 'hidden'} sm:block`}>
           <p className="mb-3 text-sm font-medium">TYPE</p>
           <div className="flex flex-col gap-2 text-sm font-light text-gray-500">
@@ -166,6 +170,7 @@ const Collection = () => {
         </div>
       </div>
 
+      {/* Products Section */}
       <div className="flex-1">
         <div className="flex justify-between text-base sm:text-2xl mb-4">
           <Title text1={'ALL'} text2={'COLLECTION'} />
@@ -180,20 +185,24 @@ const Collection = () => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
-          {filterProducts.map((item, index) => (
-            <div
-              key={index}
-              onClick={() => navigate(`/product/${item._id}`)}
-              className="cursor-pointer"
-            >
-              <ProductItem
-                name={item.name}
-                id={item.id}
-                price={item.price}
-                image={item.image}
-              />
-            </div>
-          ))}
+          {Array.isArray(filterProducts) ? (
+            filterProducts.map((item, index) => (
+              <div
+                key={index}
+                onClick={() => navigate(`/product/${item._id}`)}
+                className="cursor-pointer"
+              >
+                <ProductItem
+                  name={item.name}
+                  id={item._id} // Fixed: Changed item.id to item._id
+                  price={item.price}
+                  image={item.image}
+                />
+              </div>
+            ))
+          ) : (
+            <p>No products available</p>
+          )}
         </div>
       </div>
     </div>
